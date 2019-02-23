@@ -137,12 +137,16 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        if (rb.velocity.y<=0)    // Fix a bug when jump but playerstate is still walk/stand
         {
-            if (Input.GetAxisRaw("Horizontal") > 0 || Input.GetAxisRaw("Horizontal") < 0)
-                ChangePlayerState(PlayerState.Walk);
-            else
-            ChangePlayerState(PlayerState.Stand);
+            if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
+            {
+                if (Input.GetAxisRaw("Horizontal") > 0 || Input.GetAxisRaw("Horizontal") < 0)
+                    ChangePlayerState(PlayerState.Walk);
+                else
+                    ChangePlayerState(PlayerState.Stand);
+            }
         }
+        
     }
 }

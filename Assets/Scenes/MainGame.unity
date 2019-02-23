@@ -74502,6 +74502,16 @@ PrefabInstance:
       propertyPath: InGameUi
       value: 
       objectReference: {fileID: 303805134}
+    - target: {fileID: 7280185882751371417, guid: 00adc24f8a7f7b44488b150463ce8f7d,
+        type: 3}
+      propertyPath: enemyType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7280185882751371417, guid: 00adc24f8a7f7b44488b150463ce8f7d,
+        type: 3}
+      propertyPath: leftLimit
+      value: -5
+      objectReference: {fileID: 0}
     - target: {fileID: 639087990, guid: 00adc24f8a7f7b44488b150463ce8f7d, type: 3}
       propertyPath: m_Layer
       value: 9

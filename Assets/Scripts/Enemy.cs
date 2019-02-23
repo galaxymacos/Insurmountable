@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Enemy : Character
 {
@@ -27,6 +28,17 @@ public class Enemy : Character
     public float nextAttackTime;
     public bool playerInRange;
     public Rigidbody rb;
+    
+    // enemy type
+    [SerializeField] private EnemyKind enemyType;
+    
+    // Patrol variable
+    [SerializeField] private float leftLimit = 5f;
+    [SerializeField] private float rightLimit = 5f;
+    [SerializeField] private float currentDistanceFromCenter = 0;
+    [SerializeField] private float patrolSpeed = 5f;
+    [SerializeField] private bool patrolRight = true;
+    
 
 
     internal float StiffTimeRemain;
@@ -76,27 +88,70 @@ public class Enemy : Character
 
     private void FixedUpdate()
     {
-        if (!isStiffed && _enemyCurrentState == EnemyState.Standing)
+        switch (enemyType)
         {
-            var position = transform.position;
-            if ((position - _player.transform.position).magnitude > attackRange)
-            {
-                playerInRange = false;
-                var chasingDirection = (_player.transform.position - position).normalized;
-                rb.MovePosition(position + chasingDirection * moveSpeed * Time.fixedDeltaTime);
-            }
-            else
-            {
-                playerInRange = true;
-            }
-
-            if (playerInRange)
-                if (Time.time >= nextAttackTime)
+            case EnemyKind.patrol:
+                if (!isStiffed && _enemyCurrentState == EnemyState.Standing)
                 {
-                    Attack();
-                    nextAttackTime = Time.time + 1 / attackSpeed;
+                    var position = transform.position;
+                    if (patrolRight)
+                    {
+                        rb.MovePosition(position+new Vector3(patrolSpeed*Time.fixedDeltaTime,0,0));
+                        currentDistanceFromCenter += patrolSpeed * Time.fixedDeltaTime;
+                        if (currentDistanceFromCenter >= rightLimit)
+                        {
+                            patrolRight = false;
+                        }
+                        print("Walking right");
+                    }
+                    else
+                    {
+                        rb.MovePosition(position+new Vector3(-patrolSpeed*Time.fixedDeltaTime,0,0));
+                        currentDistanceFromCenter -= patrolSpeed * Time.fixedDeltaTime;
+                        if (currentDistanceFromCenter <= leftLimit)
+                        {
+                            patrolRight = true;
+                        }
+                        print("Walking left");
+
+                    }
+                    
                 }
+                break;
+            case EnemyKind.chase:
+                if (!isStiffed && _enemyCurrentState == EnemyState.Standing)
+                {
+                    var position = transform.position;
+                    if ((position - _player.transform.position).magnitude > attackRange)
+                    {
+                        playerInRange = false;
+                        var chasingDirection = (_player.transform.position - position).normalized;
+                        rb.MovePosition(position + chasingDirection * moveSpeed * Time.fixedDeltaTime);
+                    }
+                    else
+                    {
+                        playerInRange = true;
+                    }
+
+                    if (playerInRange)
+                        if (Time.time >= nextAttackTime)
+                        {
+                            Attack();
+                            nextAttackTime = Time.time + 1 / attackSpeed;
+                        }
+                }
+
+                break;
+            case EnemyKind.standstill:
+                break;
+            case EnemyKind.fly:
+                break;
+            case EnemyKind.ranged:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
+        
     }
 
 
@@ -130,5 +185,15 @@ public class Enemy : Character
         Standing,
         GotHitToAir,
         LayOnGround
+    }
+
+    public enum EnemyKind
+    {
+        patrol,
+        chase,
+        standstill,
+        fly,
+        ranged
+        
     }
 }
